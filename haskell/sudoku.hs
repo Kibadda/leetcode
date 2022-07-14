@@ -42,17 +42,17 @@ change i x xs =
   let (start, _ : end) = splitAt (i - 1) xs
    in start ++ x : end
 
-solve :: Int -> Int -> [Int] -> [Int]
-solve 81 x xs = xs
-solve i 10 xs = solve (getLastFillable i) ((xs !! getLastFillable i) + 1) (change i 0 xs)
-solve i x xs =
+solve :: Int -> Int -> ([Int], [(Int, Int)]) -> ([Int], [(Int, Int)])
+solve 81 x (xs, log) = (xs, log)
+solve i 10 (xs, log) = solve (getLastFillable i) ((xs !! getLastFillable i) + 1) (change i 0 xs, (getLastFillable i, 10) : log)
+solve i x (xs, log) =
   if isValid i x xs
-    then solve (getNextFillable i) 1 (change i x xs)
-    else solve i (x + 1) xs
+    then solve (getNextFillable i) 1 (change i x xs, (getNextFillable i, x) : log)
+    else solve i (x + 1) (xs, (i, x) : log)
 
-startSolve :: [Int] -> [Int]
+startSolve :: ([Int], [(Int, Int)]) -> ([Int], [(Int, Int)])
 startSolve = solve 0 1
 
 main :: IO ()
 main = do
-  print (startSolve input)
+  print (startSolve (input, [(0, 1)]))
