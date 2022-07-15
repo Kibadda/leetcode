@@ -39,20 +39,32 @@ getLastFillable i =
 
 change :: Int -> Int -> [Int] -> [Int]
 change i x xs =
-  let (start, _ : end) = splitAt (i - 1) xs
+  let (start, _ : end) = splitAt i xs
    in start ++ x : end
 
-solve :: Int -> Int -> ([Int], [(Int, Int)]) -> ([Int], [(Int, Int)])
-solve 81 x (xs, log) = (xs, log)
-solve i 10 (xs, log) = solve (getLastFillable i) ((xs !! getLastFillable i) + 1) (change i 0 xs, (getLastFillable i, 10) : log)
-solve i x (xs, log) =
+solve :: Int -> Int -> [Int] -> [Int]
+solve 25 x xs = xs
+solve i 10 xs = solve (getLastFillable i) ((xs !! getLastFillable i) + 1) (change i 0 xs)
+solve i x xs =
   if isValid i x xs
-    then solve (getNextFillable i) 1 (change i x xs, (getNextFillable i, x) : log)
-    else solve i (x + 1) (xs, (i, x) : log)
+    then solve (getNextFillable i) 1 (change i x xs)
+    else solve i (x + 1) xs
 
-startSolve :: ([Int], [(Int, Int)]) -> ([Int], [(Int, Int)])
+startSolve :: [Int] -> [Int]
 startSolve = solve 0 1
+
+solve' :: Int -> Int -> ([Int], [(Int, Int, String)]) -> ([Int], [(Int, Int, String)])
+solve' 24 x (xs, log) = (xs, log)
+solve' i 10 (xs, log) = solve' (getLastFillable i) ((xs !! getLastFillable i) + 1) (change i 0 xs, (i, 10, "b") : log)
+solve' i x (xs, log) =
+  if isValid i x xs
+    then solve' (getNextFillable i) 1 (change i x xs, (i, x, "i") : log)
+    else solve' i (x + 1) (xs, (i, x, "u") : log)
+
+startSolve' :: ([Int], [(Int, Int, String)]) -> ([Int], [(Int, Int, String)])
+startSolve' = solve' 0 1
 
 main :: IO ()
 main = do
-  print (startSolve (input, [(0, 1)]))
+  -- print (startSolve' (input, [(0, 1, "a")]))
+  print (startSolve input)
