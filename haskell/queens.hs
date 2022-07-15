@@ -23,8 +23,8 @@ showBoard = intercalate "\n" . map showLine
 printBoard :: Grid -> IO ()
 printBoard board = putStrLn $ showBoard board
 
-input :: Grid
-input = [[0 | y <- [0 .. 7]] | x <- [0 .. 7]]
+generateBoard :: Int -> Grid
+generateBoard size = [[0 | y <- [0 .. (size - 1)]] | x <- [0 .. (size - 1)]]
 
 rows :: Grid -> Grid
 rows board = [x | x <- board]
@@ -80,12 +80,15 @@ findLastQueen pos board
 solve :: Int -> Grid -> Grid
 solve pos board
   | pos < 0 = [[]]
-  | pos >= length board ^ 2 =
+  | pos == length board * length board =
     if sum (map sum board) == length board
       then board
-      else solve (findLastQueen pos board) (removeQueenAtPos (findLastQueen pos board) board)
+      else solve (findLastQueen (pos - 1) board + 1) (removeQueenAtPos (findLastQueen (pos - 1) board) board)
   | isValidAtPos pos board = solve (pos + 1) (insertQueenAtPos pos board)
   | otherwise = solve (pos + 1) board
 
-main :: IO ()
-main = printBoard (solve 0 input)
+mainSolve :: Int -> IO ()
+mainSolve size = printBoard (solve 0 (generateBoard size))
+
+mainSolve' :: Int -> Int -> IO ()
+mainSolve' size pos = printBoard (solve pos (generateBoard size))
