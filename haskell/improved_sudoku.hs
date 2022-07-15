@@ -15,6 +15,23 @@ chunksOf n l
   | n > 0 = take n l : chunksOf n (drop n l)
   | otherwise = error "Negative or zero"
 
+showLine :: Row -> String
+showLine =
+  intercalate " | "
+    . map unwords
+    . chunksOf 3
+    . map show
+
+showBoard :: Grid -> String
+showBoard =
+  intercalate "---------------------\n"
+    . map unlines
+    . chunksOf 3
+    . map showLine
+
+printBoard :: Grid -> IO ()
+printBoard board = putStrLn $ showBoard board
+
 -- /helper stuff
 
 input :: Grid
@@ -93,23 +110,6 @@ solve number pos board cancelPos
   | number > 9 = solve ((row pos board !! (getLastFillablePos pos `mod` 9)) + 1) (getLastFillablePos pos) (changeNumberAtPos 0 pos board) cancelPos
   | isValidAtPos number pos board = solve 1 (getNextFillablePos pos) (changeNumberAtPos number pos board) cancelPos
   | otherwise = solve (number + 1) pos board cancelPos
-
-showLine :: Row -> String
-showLine =
-  intercalate " | "
-    . map unwords
-    . chunksOf 3
-    . map show
-
-showBoard :: Grid -> String
-showBoard =
-  intercalate "---------------------\n"
-    . map unlines
-    . chunksOf 3
-    . map showLine
-
-printBoard :: Grid -> IO ()
-printBoard board = putStrLn $ showBoard board
 
 main :: IO ()
 main = printBoard (solve 1 (getNextFillablePos (-1)) input 80)
