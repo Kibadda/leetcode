@@ -23,6 +23,8 @@ showBoard = intercalate "\n" . map showLine
 printBoard :: Grid -> IO ()
 printBoard board = putStrLn $ showBoard board
 
+----------------------------------------------
+
 generateBoard :: Int -> Grid
 generateBoard size = [[0 | y <- [0 .. (size - 1)]] | x <- [0 .. (size - 1)]]
 
