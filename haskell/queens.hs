@@ -8,14 +8,13 @@ type Col = [Int]
 
 type Dia = [Int]
 
-chunksOf :: Int -> [a] -> [[a]]
-chunksOf _ [] = []
-chunksOf n l
-  | n > 0 = take n l : chunksOf n (drop n l)
-  | otherwise = error "Negative or zero"
+convert :: Int -> String
+convert number
+  | number > 0 = "8"
+  | otherwise = "."
 
 showLine :: [Int] -> String
-showLine = unwords . map show
+showLine = unwords . map convert
 
 showBoard :: Grid -> String
 showBoard = intercalate "\n" . map showLine
@@ -47,7 +46,11 @@ col :: Int -> Grid -> Col
 col pos board = cols board !! (pos `mod` length board)
 
 dia :: Int -> Grid -> Dia
-dia pos board = (diagonals1 board !! ((pos `mod` length board) + (pos `div` length board))) ++ (diagonals2 board !! (length board - (pos `mod` length board) + (pos `div` length board) - 1))
+dia pos board =
+  (diagonals1 board !! (posMod + posDiv)) ++ (diagonals2 board !! (length board - posMod + posDiv - 1))
+  where
+    posMod = pos `mod` length board
+    posDiv = pos `div` length board
 
 isValidInRow :: Row -> Bool
 isValidInRow row = 1 `notElem` row
@@ -64,15 +67,17 @@ isValidAtPos pos board =
 
 insertQueenAtPos :: Int -> Grid -> Grid
 insertQueenAtPos pos board =
-  let (rowsStart, row : rowsEnd) = splitAt (pos `div` length board) board
-   in let (start, _ : end) = splitAt (pos `mod` length board) row
-       in rowsStart ++ (start ++ 1 : end) : rowsEnd
+  rowsStart ++ (start ++ 1 : end) : rowsEnd
+  where
+    (rowsStart, row : rowsEnd) = splitAt (pos `div` length board) board
+    (start, _ : end) = splitAt (pos `mod` length board) row
 
 removeQueenAtPos :: Int -> Grid -> Grid
 removeQueenAtPos pos board =
-  let (rowsStart, row : rowsEnd) = splitAt (pos `div` length board) board
-   in let (start, _ : end) = splitAt (pos `mod` length board) row
-       in rowsStart ++ (start ++ 0 : end) : rowsEnd
+  rowsStart ++ (start ++ 0 : end) : rowsEnd
+  where
+    (rowsStart, row : rowsEnd) = splitAt (pos `div` length board) board
+    (start, _ : end) = splitAt (pos `mod` length board) row
 
 findLastQueen :: Int -> Grid -> Int
 findLastQueen pos board
@@ -82,12 +87,14 @@ findLastQueen pos board
 solve :: Int -> Grid -> Grid
 solve pos board
   | pos < 0 = [[]]
-  | pos == length board * length board =
-    if sum (map sum board) == length board
-      then board
-      else solve (findLastQueen (pos - 1) board + 1) (removeQueenAtPos (findLastQueen (pos - 1) board) board)
+  | posEnd && amountQueens == length board = board
+  | posEnd && amountQueens < length board = solve (lastQueenPos + 1) (removeQueenAtPos lastQueenPos board)
   | isValidAtPos pos board = solve (pos + 1) (insertQueenAtPos pos board)
   | otherwise = solve (pos + 1) board
+  where
+    posEnd = pos == length board * length board
+    lastQueenPos = findLastQueen (pos - 1) board
+    amountQueens = sum (map sum board)
 
 mainSolve :: Int -> IO ()
 mainSolve size = printBoard (solve 0 (generateBoard size))

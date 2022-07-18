@@ -8,6 +8,11 @@ type Col = [Int]
 
 type Box = [Int]
 
+convert :: Int -> String
+convert number
+  | number > 0 = show number
+  | otherwise = "."
+
 chunksOf :: Int -> [a] -> [[a]]
 chunksOf _ [] = []
 chunksOf n l
@@ -19,11 +24,11 @@ showLine =
   intercalate " | "
     . map unwords
     . chunksOf 3
-    . map show
+    . map convert
 
 showBoard :: Grid -> String
 showBoard =
-  intercalate "---------------------\n"
+  intercalate "------+-------+------\n"
     . map unlines
     . chunksOf 3
     . map showLine
