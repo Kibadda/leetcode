@@ -75,7 +75,7 @@ removeZeros street = [x | x <- street, x /= 0]
 
 isValidInStreet :: Int -> Int -> Grid -> Bool
 isValidInStreet number pos board =
-  checkStreet (length streetRow) (number : removeZeros streetRow) && checkStreet (length streetCol) (number : removeZeros streetCol)
+  checkStreet (length streetRow + 1) (number : removeZeros streetRow) && checkStreet (length streetCol + 1) (number : removeZeros streetCol)
   where
     streetRow = getStreetInRow pos board pos
     streetCol = getStreetInCol pos board pos
@@ -104,7 +104,7 @@ getLastFillablePos pos
 solve :: Int -> Int -> Grid -> Grid
 solve number pos board
   | pos < 0 = [[]]
-  | pos > length board * length board = board
+  | pos >= length board * length board = board
   | number > 9 = solve (numberAtLastPos + 1) lastPos (changeNumberAtPos 0 pos board)
   | valid = solve 1 nextPos (changeNumberAtPos number pos board)
   | otherwise = solve (number + 1) pos board
@@ -117,7 +117,7 @@ solve number pos board
 solveWithLog :: Int -> Int -> (Grid, [(Int, Int, Char)]) -> (Grid, [(Int, Int, Char)])
 solveWithLog number pos (board, log)
   | pos < 0 = ([[]], log)
-  | pos > length board * length board = (board, log)
+  | pos >= length board * length board = (board, log)
   | number > 9 = solveWithLog ((row pos board !! (lastPos `mod` 9)) + 1) lastPos (changeNumberAtPos 0 pos board, (pos, number, 'b') : log)
   | valid = solveWithLog 1 nextPos (changeNumberAtPos number pos board, (pos, number, 'i') : log)
   | otherwise = solveWithLog (number + 1) pos (board, log)
