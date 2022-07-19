@@ -20,7 +20,7 @@ showBoard :: Grid -> String
 showBoard = intercalate "\n" . map showLine
 
 printBoard :: Grid -> IO ()
-printBoard board = putStrLn $ showBoard board
+printBoard = putStrLn . showBoard
 
 ----------------------------------------------
 
@@ -37,7 +37,7 @@ diagonals1 :: Grid -> Grid
 diagonals1 board = [[y | (row, x) <- zip [0 ..] board, (col, y) <- zip [0 ..] x, row + col == k] | k <- [0 .. (2 * length board - 2)]]
 
 diagonals2 :: Grid -> Grid
-diagonals2 board = diagonals1 $ reverse $ transpose board
+diagonals2 = diagonals1 . reverse . transpose
 
 row :: Int -> Grid -> Row
 row pos board = rows board !! (pos `div` length board)

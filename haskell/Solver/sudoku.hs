@@ -34,7 +34,7 @@ showBoard =
     . map showLine
 
 printBoard :: Grid -> IO ()
-printBoard board = putStrLn $ showBoard board
+printBoard = putStrLn . showBoard
 
 -------------------------------------------------------------
 
