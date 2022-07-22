@@ -1,11 +1,13 @@
+import Control.Monad
+
 data WithLog a = WithLog {getValue :: a, getLog :: [String]} deriving (Show)
 
 instance Functor WithLog where
-  fmap f (WithLog x log) = WithLog (f x) log
+  fmap = liftM
 
 instance Applicative WithLog where
-  pure f = WithLog f []
-  (WithLog f log) <*> something = fmap f something
+  pure = return
+  (<*>) = ap
 
 instance Monad WithLog where
   return x = WithLog x []
